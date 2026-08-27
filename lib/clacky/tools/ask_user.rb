@@ -5,16 +5,17 @@ module Clacky
     class AskUser < Base
       self.tool_name = "ask_user"
       self.tool_description = <<~DESC
-        Ask the user to choose when you cannot infer the answer and guessing would waste work.
-        Keep every question concise: one sentence, no more than 80 characters.
+        Use this tool when you need to ask the user questions during execution. This allows you to:
+        1. Gather user preferences or requirements
+        2. Clarify ambiguous instructions
+        3. Get decisions on implementation choices as you work
+        4. Offer choices to the user about what direction to take.
 
-        Every question must have `options` — this tool is for choices, not open prompts.
-        Need freeform input (a path, a name)? Just ask in your reply instead.
-        Each option must be complete enough to act on directly. Never write an "Other"
-        option — set `allow_free_text` and the UI adds one.
-
-        Batch related questions into one call; use separate calls for unrelated topics.
-        After calling, STOP and wait for the answer.
+        Usage notes:
+        - Set `allow_free_text` to true to let the user select "Other" and provide custom text input
+        - Use `multi: true` to allow multiple answers to be selected for a question
+        - If you recommend a specific option, make it the first option and set `recommended: 0`
+        - Keep every question concise: one sentence, no more than 80 characters
       DESC
 
       self.tool_parameters = {
