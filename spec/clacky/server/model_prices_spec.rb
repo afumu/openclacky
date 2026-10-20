@@ -124,6 +124,42 @@ RSpec.describe Clacky::Server::ModelPrices do
         )
       end
 
+      it "applies the gpt promotion to oc-gpt-6.1-sol" do
+        result = described_class.build("oc-gpt-6.1-sol")
+
+        expect(result[:prices]["oc-gpt-6.1-sol"]).to eq(
+          in: 0.6, out: 3.0,
+          ratio: (0.6 + 3.0) / base_total, discount: { rate: 0.3, reason: "channel" }
+        )
+      end
+
+      it "applies the gpt promotion to oc-gpt-6-astra" do
+        result = described_class.build("oc-gpt-6-astra")
+
+        expect(result[:prices]["oc-gpt-6-astra"]).to eq(
+          in: 3.0, out: 15.0,
+          ratio: (3.0 + 15.0) / base_total, discount: { rate: 0.3, reason: "channel" }
+        )
+      end
+
+      it "applies the gpt promotion to oc-gpt-6-sol" do
+        result = described_class.build("oc-gpt-6-sol")
+
+        expect(result[:prices]["oc-gpt-6-sol"]).to eq(
+          in: 0.6, out: 3.0,
+          ratio: (0.6 + 3.0) / base_total, discount: { rate: 0.3, reason: "channel" }
+        )
+      end
+
+      it "applies the gpt promotion to oc-gpt-6-luna" do
+        result = described_class.build("oc-gpt-6-luna")
+
+        expect(result[:prices]["oc-gpt-6-luna"]).to eq(
+          in: 0.03, out: 0.15,
+          ratio: (0.03 + 0.15) / base_total, discount: { rate: 0.3, reason: "channel" }
+        )
+      end
+
       it "reports the Vertex launch promo on the or-prefixed aliases" do
         result = described_class.build("or-gemini-4-argon,or-gemini-3-1-pro")
 

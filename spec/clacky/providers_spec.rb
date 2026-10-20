@@ -101,6 +101,26 @@ RSpec.describe Clacky::Providers do
                                          model_name: "oc-grok-4.7")).to be true
       end
 
+      it "returns true for openclacky + oc-gpt-6.1-sol (accepts image input)" do
+        expect(described_class.supports?("openclacky", :vision,
+                                         model_name: "oc-gpt-6.1-sol")).to be true
+      end
+
+      it "returns true for openclacky + oc-gpt-6-astra (accepts image input)" do
+        expect(described_class.supports?("openclacky", :vision,
+                                         model_name: "oc-gpt-6-astra")).to be true
+      end
+
+      it "returns true for openclacky + oc-gpt-6-sol (accepts image input)" do
+        expect(described_class.supports?("openclacky", :vision,
+                                         model_name: "oc-gpt-6-sol")).to be true
+      end
+
+      it "returns true for openclacky + oc-gpt-6-luna (accepts image input)" do
+        expect(described_class.supports?("openclacky", :vision,
+                                         model_name: "oc-gpt-6-luna")).to be true
+      end
+
       it "returns true for openclacky + abs-claude-haiku-5-5 (accepts image input)" do
         expect(described_class.supports?("openclacky", :vision,
                                          model_name: "abs-claude-haiku-5-5")).to be true

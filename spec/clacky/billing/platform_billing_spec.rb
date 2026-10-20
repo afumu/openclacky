@@ -246,5 +246,16 @@ RSpec.describe Clacky::Billing::PlatformBilling do
       expect(described_class.real_model("dsk-deepseek-flash")).to eq("deepseek-flash")
       expect(described_class.display_model("deepseek-flash")).to eq("dsk-deepseek-flash")
     end
+
+    it "resolves the oc- TokHub aliases as identities" do
+      expect(described_class.real_model("oc-gpt-6.1-sol")).to eq("oc-gpt-6.1-sol")
+      expect(described_class.display_model("oc-gpt-6.1-sol")).to eq("oc-gpt-6.1-sol")
+      expect(described_class.real_model("oc-gpt-6-astra")).to eq("oc-gpt-6-astra")
+      expect(described_class.display_model("oc-gpt-6-astra")).to eq("oc-gpt-6-astra")
+      expect(described_class.real_model("oc-gpt-6-sol")).to eq("oc-gpt-6-sol")
+      expect(described_class.display_model("oc-gpt-6-sol")).to eq("oc-gpt-6-sol")
+      expect(described_class.real_model("oc-gpt-6-luna")).to eq("oc-gpt-6-luna")
+      expect(described_class.display_model("oc-gpt-6-luna")).to eq("oc-gpt-6-luna")
+    end
   end
 end

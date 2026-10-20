@@ -40,6 +40,10 @@ module Clacky
           "dsk-deepseek-v4-pro",
           "oc-glm-5.3",
           "oc-kimi-k3",
+          "oc-gpt-6.1-sol",
+          "oc-gpt-6-astra",
+          "oc-gpt-6-sol",
+          "oc-grok-4.7",
           "abs-claude-fable-5-1",
           "abs-claude-fable-5",
           "abs-claude-opus-5-5",
@@ -60,8 +64,7 @@ module Clacky
           "abs-gpt-5.6-luna",
           "or-gemini-4-argon",
           "or-gemini-3-1-pro",
-          "or-gemini-3-8-flash",
-          "oc-grok-4.7"
+          "or-gemini-3-8-flash"
         ],
         # Image generation models served by the openclacky platform
         # gateway. The gateway exposes a standard OpenAI-compatible
@@ -146,7 +149,7 @@ module Clacky
         # oc-glm-5.3 is likewise text-only: its upstream rejects any content
         # block other than `type: "text"`, so images must never be sent
         # inline. oc-kimi-k3 and oc-grok-4.7 are natively multimodal and keep
-        # vision=true.
+        # vision=true; oc-gpt-6.1-sol, oc-gpt-6-astra and oc-gpt-6-sol do too.
         "model_capabilities" => {
           "dsk-deepseek-flash"  => { "vision" => true }.freeze,
           "dsk-deepseek-v4-pro" => { "vision" => false }.freeze,

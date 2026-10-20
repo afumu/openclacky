@@ -441,6 +441,91 @@ module Clacky
         }
       },
 
+      # GPT-6.1 Sol served through the openclacky gateway (oc- prefix, TokHub
+      # gpt group) — the same model as abs-gpt-6.1-sol, which is served by
+      # Bedrock; the two aliases exist because the lanes are priced differently.
+      # OpenAI's own card, tiered at 272K prompt tokens (the model's breakpoint,
+      # not the global 200K): above it every bucket doubles.
+      "oc-gpt-6.1-sol" => {
+        input: {
+          default: 2.00,                   # $2.00/MTok
+          over_272k: 4.00                  # $4.00/MTok
+        },
+        output: {
+          default: 10.00,                  # $10.00/MTok
+          over_272k: 20.00                 # $20.00/MTok
+        },
+        cache: {
+          write_default: 2.50,             # $2.50/MTok cache write
+          write_over_272k: 5.00,
+          read_default: 0.10,              # $0.10/MTok cache hit
+          read_over_272k: 0.20
+        },
+        tier_threshold: 272_000
+      },
+
+      # GPT-6 Astra served through the openclacky gateway (oc- prefix, same
+      # ciyuan gpt group as oc-gpt-6.1-sol, hence the same 272K breakpoint and
+      # the same series discount). Its card is much higher than Sol's.
+      "oc-gpt-6-astra" => {
+        input: {
+          default: 10.00,                  # $10.00/MTok
+          over_272k: 20.00                 # $20.00/MTok
+        },
+        output: {
+          default: 50.00,                  # $50.00/MTok
+          over_272k: 75.00                 # $75.00/MTok
+        },
+        cache: {
+          write_default: 12.50,            # $12.50/MTok cache write
+          write_over_272k: 25.00,
+          read_default: 1.00,              # $1.00/MTok cache hit
+          read_over_272k: 2.00
+        },
+        tier_threshold: 272_000
+      },
+
+      # GPT-6 Sol rides the same ciyuan gpt group and 272K breakpoint, and opens
+      # at the same $2 / $10 as 6.1 Sol, but its long-context card is its own:
+      # output goes to $15 (1.5x, not 2x) while cache reads jump 4x to $0.40.
+      "oc-gpt-6-sol" => {
+        input: {
+          default: 2.00,                   # $2.00/MTok
+          over_272k: 4.00                  # $4.00/MTok
+        },
+        output: {
+          default: 10.00,                  # $10.00/MTok
+          over_272k: 15.00                 # $15.00/MTok
+        },
+        cache: {
+          write_default: 2.50,             # $2.50/MTok cache write
+          write_over_272k: 5.00,
+          read_default: 0.10,              # $0.10/MTok cache hit
+          read_over_272k: 0.40
+        },
+        tier_threshold: 272_000
+      },
+
+      # GPT-6 Luna rides the same ciyuan gpt group and 272K breakpoint as
+      # Sol/Astra, but sits at the cheap end: $0.10 in / $0.50 out.
+      "oc-gpt-6-luna" => {
+        input: {
+          default: 0.10,                   # $0.10/MTok
+          over_272k: 0.20                  # $0.20/MTok
+        },
+        output: {
+          default: 0.50,                   # $0.50/MTok
+          over_272k: 0.75                  # $0.75/MTok
+        },
+        cache: {
+          write_default: 0.125,            # $0.125/MTok cache write
+          write_over_272k: 0.25,
+          read_default: 0.01,              # $0.01/MTok cache hit
+          read_over_272k: 0.02
+        },
+        tier_threshold: 272_000
+      },
+
       # Grok 4.7 served through the openclacky gateway (oc- prefix, TokHub
       # upstream). Official xAI list price; the long-context surcharge xAI
       # applies above 200K prompt tokens is not passed through, so both tiers
@@ -1133,6 +1218,7 @@ module Clacky
       { match: /\Aoc-glm-/,          rate: 0.95, reason: "channel" }, # GLM via ciyuan glm - 5% off
       { match: /\Aoc-kimi-/,         rate: 0.9,  reason: "channel" }, # Kimi K3 via ciyuan - 10% off
       { match: /\Aoc-grok-/,         rate: 0.3,  reason: "channel" }, # Grok 4.7 via ciyuan grok - 70% off
+      { match: /\Aoc-gpt-/,          rate: 0.3,  reason: "channel" }, # GPT-6.1 Sol via ciyuan gpt - 70% off
       { match: /\Aor-(gemini|veo)-/, rate: 0.8,  reason: "promo" }    # Vertex Gemini/Veo launch promo - 20% off
     ].freeze
 

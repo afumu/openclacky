@@ -977,6 +977,54 @@ RSpec.describe Clacky::ModelPricing do
         .to be_within(0.001).of(2.40)
     end
 
+    it "bills GPT-6.1 Sol on its own 272K tier at the gpt promo rate" do
+      # GPT-6.1 Sol lists at $2.00 in / $10.00 out below 272K and doubles to
+      # $4.00 / $20.00 above it — a breakpoint of its own, not the global 200K.
+      short = { prompt_tokens: 200_000, completion_tokens: 100_000 }
+      long = { prompt_tokens: 300_000, completion_tokens: 100_000 }
+
+      expect(described_class.calculate_cost(model: "oc-gpt-6.1-sol", usage: short)[:cost])
+        .to be_within(0.001).of(1.40 * 0.3)
+      expect(described_class.calculate_cost(model: "oc-gpt-6.1-sol", usage: long)[:cost])
+        .to be_within(0.001).of(3.20 * 0.3)
+    end
+
+    it "bills GPT-6 Astra on the same 272K breakpoint with its own card" do
+      # Astra lists at $10.00 in / $50.00 out below 272K and $20.00 / $75.00
+      # above it, while riding the oc-gpt- 0.3 series discount.
+      short = { prompt_tokens: 200_000, completion_tokens: 100_000 }
+      long = { prompt_tokens: 300_000, completion_tokens: 100_000 }
+
+      expect(described_class.calculate_cost(model: "oc-gpt-6-astra", usage: short)[:cost])
+        .to be_within(0.001).of(7.00 * 0.3)
+      expect(described_class.calculate_cost(model: "oc-gpt-6-astra", usage: long)[:cost])
+        .to be_within(0.001).of(13.50 * 0.3)
+    end
+
+    it "bills GPT-6 Sol on its own 272K card" do
+      # GPT-6 Sol shares 6.1 Sol's $2 / $10 base, but its long-context card
+      # differs: $4 in, $15 out (1.5x) and $0.40 cache reads (4x).
+      short = { prompt_tokens: 200_000, completion_tokens: 100_000 }
+      long = { prompt_tokens: 300_000, completion_tokens: 100_000 }
+
+      expect(described_class.calculate_cost(model: "oc-gpt-6-sol", usage: short)[:cost])
+        .to be_within(0.001).of(1.40 * 0.3)
+      expect(described_class.calculate_cost(model: "oc-gpt-6-sol", usage: long)[:cost])
+        .to be_within(0.001).of(2.70 * 0.3)
+    end
+
+    it "bills GPT-6 Luna at the cheap end of the same 272K tier" do
+      # Luna lists at $0.10 in / $0.50 out below 272K and $0.20 / $0.75 above
+      # it, on the same oc-gpt- 0.3 series discount.
+      short = { prompt_tokens: 200_000, completion_tokens: 100_000 }
+      long = { prompt_tokens: 300_000, completion_tokens: 100_000 }
+
+      expect(described_class.calculate_cost(model: "oc-gpt-6-luna", usage: short)[:cost])
+        .to be_within(0.001).of(0.07 * 0.3)
+      expect(described_class.calculate_cost(model: "oc-gpt-6-luna", usage: long)[:cost])
+        .to be_within(0.001).of(0.135 * 0.3)
+    end
+
     it "leaves the BYOK ids sitting behind those same models at list price" do
       usage = { prompt_tokens: 1_000_000, completion_tokens: 1_000_000 }
 
@@ -996,6 +1044,10 @@ RSpec.describe Clacky::ModelPricing do
       expect(described_class.discount_rate("oc-glm-5.3")).to eq(0.95)
       expect(described_class.discount_rate("oc-kimi-k3")).to eq(0.9)
       expect(described_class.discount_rate("oc-grok-4.7")).to eq(0.3)
+      expect(described_class.discount_rate("oc-gpt-6.1-sol")).to eq(0.3)
+      expect(described_class.discount_rate("oc-gpt-6-astra")).to eq(0.3)
+      expect(described_class.discount_rate("oc-gpt-6-sol")).to eq(0.3)
+      expect(described_class.discount_rate("oc-gpt-6-luna")).to eq(0.3)
       expect(described_class.discount_rate("or-gemini-4-argon")).to eq(0.8)
       expect(described_class.discount_rate("or-veo-3-1")).to eq(0.8)
       expect(described_class.discount_rate("glm-5.3")).to eq(1.0)
@@ -1012,6 +1064,11 @@ RSpec.describe Clacky::ModelPricing do
       expect(described_class.discount_info("abs-claude-opus-5-5")).to eq(rate: 0.6, reason: "channel")
       expect(described_class.discount_info("oc-kimi-k3")).to eq(rate: 0.9, reason: "channel")
       expect(described_class.discount_info("oc-grok-4.7")).to eq(rate: 0.3, reason: "channel")
+      expect(described_class.discount_info("oc-gpt-6.1-sol")).to eq(rate: 0.3, reason: "channel")
+      expect(described_class.discount_info("oc-gpt-6-astra")).to eq(rate: 0.3, reason: "channel")
+      expect(described_class.discount_info("oc-gpt-6-sol")).to eq(rate: 0.3, reason: "channel")
+      expect(described_class.discount_info("oc-gpt-6-luna")).to eq(rate: 0.3, reason: "channel")
+      expect(described_class.discount_info("abs-gpt-6.1-sol")).to be_nil
       expect(described_class.discount_info("or-gemini-3-1-pro")).to eq(rate: 0.8, reason: "promo")
       expect(described_class.discount_info("or-veo-3-1")).to eq(rate: 0.8, reason: "promo")
       expect(described_class.discount_info("gemini-4-argon")).to be_nil
