@@ -1237,11 +1237,11 @@ body {
 
 .cmd-palette {
   width: 100%;
-  max-width: 34rem;
+  max-width: 50rem;
   margin: 0 1rem;
   background: var(--color-bg-card, var(--color-bg-secondary));
   border: 1px solid var(--color-border-primary);
-  border-radius: 12px;
+  border-radius: 14px;
   box-shadow: var(--shadow-lg, 0 12px 40px rgba(0,0,0,0.25));
   overflow: hidden;
   transform: translateY(-8px) scale(0.99);
@@ -1255,27 +1255,147 @@ body {
   border-radius: 0;
   border-bottom: 1px solid var(--color-border-secondary);
   background: transparent;
+  padding: 0.75rem;
 }
-.cmd-palette .search-input-row { height: 3rem; }
+
+/* Input row reads as its own surface: pill outline, focus ring on the border */
+.cmd-palette .search-input-wrap {
+  display: flex;
+  align-items: center;
+  gap: 0.375rem;
+}
+.cmd-palette .search-input-row {
+  flex: 1;
+  min-width: 0;
+  height: 2.25rem;
+  padding: 0 0.5rem 0 0.9375rem;
+  gap: 0.5rem;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-card);
+  transition: border-color 0.12s ease;
+}
+.cmd-palette .search-input-row:focus-within {
+  border-color: color-mix(in srgb, var(--color-accent-primary) 45%, var(--color-border-primary));
+}
+.cmd-palette .search-icon svg { width: 1rem; height: 1rem; }
 .cmd-palette .search-input { font-size: 0.9375rem; }
 
-/* ESC chip in the input row */
-.cmd-palette-esc {
+/* Clear stays a text affordance; the pill outline owns the emphasis */
+.cmd-palette .btn-search-q-clear {
   flex-shrink: 0;
-  font-family: var(--font-mono);
-  font-size: 0.625rem;
-  letter-spacing: 0.04em;
+  width: auto;
+  height: 1.375rem;
+  padding: 0 0.375rem;
+  border-radius: 0.375rem;
+  background: transparent;
   color: var(--color-text-muted);
-  padding: 0.125rem 0.375rem;
-  border: 1px solid var(--color-border-secondary);
-  border-radius: var(--radius-sm);
-  background: var(--color-bg-secondary);
-  cursor: pointer;
-  transition: color 0.12s, border-color 0.12s;
+  font-size: 0.8125rem;
+  opacity: 1;
 }
-.cmd-palette-esc:hover {
+.cmd-palette .btn-search-q-clear:hover {
   color: var(--color-text-secondary);
-  border-color: var(--color-border-primary);
+  background: var(--color-bg-hover);
+}
+
+/* Filter row: chip-shaped triggers, no hairline divider */
+.cmd-palette .search-filter-row {
+  height: auto;
+  border-top: none;
+  padding: 0.625rem 0 0;
+  gap: 0.5rem;
+}
+.cmd-palette .search-select {
+  flex: 0 0 auto;
+  width: fit-content;
+  min-width: 6.5rem;
+  height: 1.875rem;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-card);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+.cmd-palette .search-select .custom-select-trigger--bare {
+  width: 100%;
+  padding: 0 0.5rem 0 0.625rem;
+  font-size: 0.8125rem;
+}
+.cmd-palette .search-select .placeholder,
+.cmd-palette .search-select .custom-select-value:not(.placeholder),
+.cmd-palette .search-select .custom-select-arrow {
+  color: var(--color-text-primary);
+  font-weight: 400;
+}
+.cmd-palette .search-date-wrap {
+  flex: 0 0 auto;
+  min-width: 6.5rem;
+  height: 1.875rem;
+  padding: 0;
+  border: 1px solid var(--color-border-primary);
+  border-radius: var(--radius-pill);
+  background: var(--color-bg-card);
+  color: var(--color-text-primary);
+  transition: border-color 0.12s ease, background 0.12s ease;
+}
+/* Button spans the whole pill so padding and icon areas stay clickable */
+.cmd-palette .search-date {
+  flex: 1 1 auto;
+  height: 100%;
+  padding: 0 2.1875rem 0 0.625rem;
+  border-radius: inherit;
+  font-size: 0.8125rem;
+  color: inherit;
+}
+.cmd-palette .search-date-icon {
+  right: 0.5rem;
+  width: 0.9375rem;
+  height: 0.9375rem;
+  stroke-width: 1.8;
+  color: inherit;
+}
+.cmd-palette .search-date-wrap:has(.search-date[data-active="true"]) {
+  color: var(--color-accent-primary);
+}
+
+/* Hover / expanded state for the two filter pills */
+.cmd-palette .search-select:hover,
+.cmd-palette .search-date-wrap:hover,
+.cmd-palette .search-select:has(.custom-select-trigger.open) {
+  background: color-mix(in srgb, var(--color-bg-hover) 45%, var(--color-bg-card));
+}
+.cmd-palette .search-select:has(.custom-select-trigger.open) {
+  border-color: var(--color-border-strong);
+}
+.cmd-palette .search-select:hover .placeholder,
+.cmd-palette .search-select:has(.custom-select-trigger.open) .placeholder {
+  color: var(--color-text-primary);
+}
+.cmd-palette .search-select:hover .custom-select-arrow,
+.cmd-palette .search-select:has(.custom-select-trigger.open) .custom-select-arrow {
+  color: var(--color-text-primary);
+}
+.cmd-palette .btn-search-clear-all { margin-left: auto; }
+
+/* Close sits outside the pill, matching its height so the row reads as one unit */
+.cmd-palette-close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.25rem;
+  height: 2.25rem;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: transparent;
+  color: color-mix(in srgb, var(--color-text-secondary) 65%, var(--color-text-muted));
+  cursor: pointer;
+  transition: color 0.12s ease, background 0.12s ease;
+}
+.cmd-palette-close svg { width: 1rem; height: 1rem; }
+.cmd-palette-close:hover {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
 }
 
 /* Results region */
@@ -1285,6 +1405,24 @@ body {
   padding: 0.375rem 0.5rem 0.5rem;
 }
 .cmd-palette-results .session-item { border-radius: 7px; }
+.cmd-palette-results .session-body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: 0.75rem;
+  align-items: center;
+}
+.cmd-palette-results .session-meta {
+  grid-column: 2;
+  grid-row: 1;
+  margin-top: 0;
+  font-family: inherit;
+  font-size: 0.6875rem;
+  opacity: 1;
+}
+.cmd-palette-results .session-snippet {
+  grid-column: 1 / -1;
+  margin-top: 0.1875rem;
+}
 .cmd-palette-hint {
   padding: 1.75rem 1rem;
   text-align: center;
@@ -1578,30 +1716,26 @@ body {
 .session-search-group + .session-search-group {
   margin-top: 0.25rem;
 }
-
 .session-snippet {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  font-size: 0.6875rem;
-  color: var(--color-text-muted);
+  font-size: 0.75rem;
+  color: var(--color-text-secondary);
   margin-top: 2px;
-  line-height: 1.35;
-  opacity: 0.85;
+  line-height: 1.4;
 }
-.session-snippet mark {
-  background: var(--color-warning-bg, #fef3c7);
-  color: var(--color-text-primary);
-  padding: 0 2px;
-  border-radius: 2px;
-  font-weight: 500;
-}
-
+.session-snippet mark,
 .session-name__text mark {
-  background: var(--color-warning-bg, #fef3c7);
-  color: var(--color-text-primary);
+  background: #fde047;
+  color: #1f2328;
   padding: 0 1px;
-  border-radius: 2px;
+  border-radius: 3px;
+}
+[data-theme="dark"] .session-snippet mark,
+[data-theme="dark"] .session-name__text mark {
+  background: #facc15;
+  color: #111;
 }
 
 /* Legacy .btn-new-inline — kept for compat, can be removed after cleanup */
