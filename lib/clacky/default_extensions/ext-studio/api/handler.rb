@@ -119,6 +119,14 @@ class ExtStudioExt < Clacky::ApiExtension
         # their extension before publishing.
         json(ok: false, name_taken: true,
              error: result[:error])
+      elsif result[:error_code] == "contributor_required"
+        error!(
+          result[:error] || "publishing requires contributor status",
+          status: 403,
+          error_code: "contributor_required",
+          action_url: "#{Clacky::PlatformHttpClient.base_url}/my/extensions",
+          action_label: "open_extensions_page"
+        )
       else
         error!(result[:error] || "publish failed", status: 502)
       end

@@ -50,9 +50,13 @@ module Clacky
     # Auto-detects the platform endpoint:
     #   - When CLACKY_LICENSE_SERVER is set → that URL (dev override)
     #   - Otherwise                        → PRIMARY_HOST
+    def self.base_url
+      override = ENV["CLACKY_LICENSE_SERVER"]
+      override && !override.empty? ? override.chomp("/") : PRIMARY_HOST
+    end
+
     def initialize
-      override  = ENV["CLACKY_LICENSE_SERVER"]
-      @base_url = override && !override.empty? ? override : PRIMARY_HOST
+      @base_url = self.class.base_url
     end
 
     # Send a POST request with a JSON body and return a normalised result hash.

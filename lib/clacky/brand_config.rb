@@ -683,7 +683,7 @@ module Clacky
         already_exists = body["code"].to_s.include?("taken") ||
                          body["code"].to_s.include?("already") ||
                          result[:error].to_s.include?("HTTP 409")
-        { success: false, error: msg, already_exists: already_exists }
+        { success: false, error: msg, already_exists: already_exists, error_code: code }
       end
     rescue StandardError => e
       { success: false, error: "Network error: #{e.message}" }

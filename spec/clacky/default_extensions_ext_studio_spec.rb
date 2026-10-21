@@ -207,9 +207,15 @@ RSpec.describe "ExtStudioExt device binding modal" do
   end
 
   it "renders the verification link as a primary footer button" do
-    expect(view_source).to include('const link = el("a", { class: "btn-primary", target: "_blank", rel: "noopener", text: t("bind.openLink") });')
+    expect(view_source).to include('const link = el("a", { class: "btn-primary", target: "_blank", rel: "noopener", "data-open-external": "1", text: t("bind.openLink") });')
     expect(view_source).to include("modal.footer.appendChild(link);")
     expect(view_source).to include('body: el("div", null, [status, codeLine]),')
     expect(view_source).not_to include("studio-modal-link")
+    expect(view_source).to include('"data-open-external": "1"')
+  end
+
+  it "opts platform links out of the localhost preview interception" do
+    sessions_js = File.read(File.expand_path("../../lib/clacky/web/sessions.js", __dir__))
+    expect(sessions_js).to include('if (localLink && !localLink.hasAttribute("data-open-external")) {')
   end
 end
