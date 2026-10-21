@@ -9,18 +9,23 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     name: Ruby ${{ matrix.ruby }}
     strategy:
       matrix:
         include:
+          # ruby-builder publishes prebuilt binaries per Ubuntu image and stops
+          # at 24.04 for Ruby 2.6 and 3.3, so these pins cannot follow latest.
           - ruby: '2.6.8'
+            os: ubuntu-22.04
             lockfile: Gemfile.lock.ruby-2.6
             bundler: '2.4.22'
           - ruby: '3.3.4'
+            os: ubuntu-24.04
             lockfile: Gemfile.lock.ruby-3.3
             bundler: ''
           - ruby: '4.0.5'
+            os: ubuntu-latest
             lockfile: Gemfile.lock.ruby-4.0
             bundler: ''
     env:
