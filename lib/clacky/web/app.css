@@ -4941,6 +4941,9 @@ body {
   border: 0;
   border-radius: 3px;
   font: inherit;
+  /* <button> does not inherit color: without this the icon, count and caret
+     fall back to the UA black, which is unreadable on dark themes. */
+  color: var(--color-text-primary);
   white-space: nowrap;
   cursor: default;
   transition: width 0.18s ease, color 0.15s ease, background-color 0.15s ease;
@@ -4993,6 +4996,8 @@ body {
   width: 0.625rem;
   height: 0.625rem;
   flex-shrink: 0;
+  /* Dimmed relative to the icon and count, matching #session-info-bar .sib-caret. */
+  opacity: 0.75;
   transition: transform 0.15s ease;
 }
 .todo-panel:not(.is-open) .todo-caret { transform: rotate(180deg); }
