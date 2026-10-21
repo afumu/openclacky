@@ -328,6 +328,11 @@ module Clacky
         @messages
       end
       msgs = source.map { |m| strip_for_api(m) }
+      # A tool message with a blank id answers no announced call, and one of
+      # them makes every later request fail (422 "invalid type: null"). Drop
+      # these before pairing: a blank id is not recognized as a tool result,
+      # so pairing would otherwise insert a placeholder and orphan the real one.
+      msgs.reject! { |m| m[:role] == "tool" && m[:tool_call_id].to_s.strip.empty? }
       msgs = repair_tool_call_pairing(msgs)
       ensure_reasoning_content_consistency(msgs, force: force_reasoning_content_pad)
     end
