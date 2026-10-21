@@ -43,6 +43,7 @@ module Clacky
           "oc-gpt-6.1-sol",
           "oc-gpt-6-astra",
           "oc-gpt-6-sol",
+          "oc-gpt-6-luna",
           "oc-grok-4.7",
           "abs-claude-fable-5-1",
           "abs-claude-fable-5",
@@ -149,7 +150,8 @@ module Clacky
         # oc-glm-5.3 is likewise text-only: its upstream rejects any content
         # block other than `type: "text"`, so images must never be sent
         # inline. oc-kimi-k3 and oc-grok-4.7 are natively multimodal and keep
-        # vision=true; oc-gpt-6.1-sol, oc-gpt-6-astra and oc-gpt-6-sol do too.
+        # vision=true; oc-gpt-6.1-sol, oc-gpt-6-astra, oc-gpt-6-sol and
+        # oc-gpt-6-luna do too.
         "model_capabilities" => {
           "dsk-deepseek-flash"  => { "vision" => true }.freeze,
           "dsk-deepseek-v4-pro" => { "vision" => false }.freeze,
