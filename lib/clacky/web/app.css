@@ -4359,10 +4359,18 @@ body {
 }
 /* Time color / alignment: anchor to the bubble's own side, let width be
    driven by content — prevents overflow on narrow bubbles. */
-/* User timestamp: appended to .msg-user-wrap (not bubble), sits below action
-   buttons, right-aligned. */
-.msg-user-wrap > .msg-time { color: var(--color-text-secondary); top: auto; bottom: 0.2rem; right: 0; left: auto; padding-right: 0.25rem; }
-.msg-assistant .msg-time { color: var(--color-text-secondary); left: 0;  right: auto; padding-left: 0.25rem; }
+/* Timestamps live inside the user hover action bar (see .msg-user-actions),
+   left of the icons. */
+.msg-user-actions > .msg-time {
+  order: -1;
+  position: static;
+  margin: 0;
+  padding: 0;
+  font-size: 0.75rem;
+  opacity: 1;
+  transform: none;
+  color: var(--color-text-tertiary);
+}
 
 .msg-user      { background: var(--color-accent-soft); color: var(--color-text-primary); white-space: pre-wrap; }
 [data-theme="dark"] .msg-user { background: var(--color-accent-soft); }
@@ -4386,14 +4394,15 @@ body {
   position: relative;
   display: flex;
   justify-content: flex-end;
-  padding-bottom: 3rem;
+  padding-bottom: 1.85rem;
 }
 .msg-user-actions {
   position: absolute;
-  bottom: 1.1rem;
+  bottom: 0.15rem;
   right: 0;
   display: flex;
-  gap: 0.125rem;
+  align-items: center;
+  gap: 0.25rem;
   opacity: 0;
   transition: opacity 0.15s ease;
   pointer-events: none;
@@ -4408,25 +4417,25 @@ body {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1.625rem;
-  height: 1.625rem;
+  width: 1.5rem;
+  height: 1.5rem;
   padding: 0;
-  border: 1px solid var(--color-border-primary);
-  border-radius: 5px;
-  background: var(--color-bg-primary);
-  color: var(--color-text-secondary);
+  border: none;
+  border-radius: 4px;
+  background: transparent;
+  color: var(--color-text-tertiary);
   cursor: pointer;
-  transition: color 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, background 0.15s ease;
 }
 .msg-user-action-btn:hover {
   color: var(--color-text-primary);
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg-hover);
 }
-.msg-user-action-btn:active { transform: translateY(1px); }
-.msg-user-action-btn.is-copied {
-  color: var(--color-success);
-  border-color: var(--color-success);
+.msg-user-action-btn:active {
+  color: var(--color-text-primary);
+  background: var(--color-bg-hover);
 }
+.msg-user-action-btn.is-copied { color: var(--color-success); }
 .msg-user-copy-icon-check { display: none; }
 .msg-user-action-btn.is-copied .msg-user-copy-icon { display: none; }
 .msg-user-action-btn.is-copied .msg-user-copy-icon-check { display: inline; }
