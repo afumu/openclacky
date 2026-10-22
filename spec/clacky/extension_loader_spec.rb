@@ -541,6 +541,24 @@ RSpec.describe Clacky::ExtensionLoader do
       expect(second).to be(first)
     end
 
+    it "does not reuse a cached scan across roots whose manifest mtimes collide" do
+      dir = make_container(local, "cached", manifest: manifest_v1, files: { "handler.rb" => "# handler" })
+      stamp = File.mtime(File.join(dir, "ext.yml"))
+      described_class.load_all(layers: { local: local })
+
+      other = Dir.mktmpdir
+      begin
+        other_dir = make_container(other, "cached", manifest: manifest_v1, files: { "handler.rb" => "# handler" })
+        File.utime(stamp, stamp, File.join(other_dir, "ext.yml"))
+
+        result = described_class.load_all(layers: { local: other })
+
+        expect(result.containers["cached"][:dir]).to eq(other_dir)
+      ensure
+        FileUtils.remove_entry(other) if Dir.exist?(other)
+      end
+    end
+
     it "rescans when a manifest mtime changes" do
       dir = make_container(local, "cached", manifest: manifest_v1, files: { "handler.rb" => "# handler" })
 

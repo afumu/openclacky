@@ -288,10 +288,12 @@ module Clacky
       end
 
 
-      # A layer's fingerprint is the sorted list of "<ext_id>|<mtime>" for
+      # A layer's fingerprint is the list of [ext_id, manifest path, mtime] for
       # every container manifest present. Cheap to compute (one stat per
       # manifest); the whole map compared as a Hash so a container appearing
-      # or disappearing also invalidates.
+      # or disappearing also invalidates. The path belongs in the key: two
+      # roots can hold the same ext_id with manifests whose mtimes collide, and
+      # reusing a result across roots would hand back stale dirs.
       private def fingerprint_layers(layers)
         layers.each_with_object({}) do |(layer, root), acc|
           next unless root && Dir.exist?(root)
@@ -302,7 +304,7 @@ module Clacky
             manifest = File.join(root, ext_id, MANIFEST)
             next unless File.file?(manifest)
 
-            entries << [ext_id, File.mtime(manifest).to_f]
+            entries << [ext_id, manifest, File.mtime(manifest).to_f]
           end
           acc[layer] = entries
         end
