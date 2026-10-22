@@ -1419,9 +1419,30 @@ body {
   font-size: 0.6875rem;
   opacity: 1;
 }
+.cmd-palette-results .session-item:has(.session-snippet) {
+  min-height: 2.625rem;
+  box-sizing: border-box;
+}
+.cmd-palette-results .session-name {
+  color: var(--color-text-primary);
+  font-weight: 500;
+}
+.cmd-palette-results .session-name__text mark,
+.cmd-palette-results .session-snippet mark {
+  background: color-mix(in srgb, #fde047 55%, transparent);
+  color: var(--color-text-primary);
+}
+[data-theme="dark"] .cmd-palette-results .session-name__text mark,
+[data-theme="dark"] .cmd-palette-results .session-snippet mark {
+  background: color-mix(in srgb, #facc15 78%, transparent);
+  color: #111;
+}
 .cmd-palette-results .session-snippet {
   grid-column: 1 / -1;
-  margin-top: 0.1875rem;
+  margin-top: 0.25rem;
+  font-size: 0.72rem;
+  color: var(--color-text-muted);
+  line-height: 1.35;
 }
 .cmd-palette-hint {
   padding: 1.75rem 1rem;
