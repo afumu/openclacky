@@ -19,6 +19,7 @@ module Clacky
   #   enabled: true/false   — whether the browser tool is active
   #   chrome_version: "146" — detected Chrome version (set by browser-setup skill)
   #   configured_at: date   — when setup was last run
+  #   screenshot_max_base64_bytes: Integer — screenshot size ceiling (settings UI)
   #
   # Liveness check strategy:
   #   process_alive? sends an MCP `ping` (standard in MCP spec 2024-11-05) and
@@ -116,25 +117,47 @@ module Clacky
       enabled = cfg["enabled"] == true
       running = @process && @process[:wait_thr]&.alive?
       {
-        enabled:        enabled,
-        daemon_running: !!running,
-        chrome_version: cfg["chrome_version"]
+        enabled:                     enabled,
+        daemon_running:              !!running,
+        chrome_version:              cfg["chrome_version"],
+        screenshot_max_base64_bytes: effective_screenshot_limit(cfg)
       }
     end
 
     # Write browser.yml with the given config and reload the daemon.
     # Called by HttpServer POST /api/browser/configure.
+    # Existing keys are preserved so re-running browser-setup does not wipe
+    # user preferences such as the screenshot limits.
     # @param chrome_version [String] detected Chrome major version
     def configure(chrome_version:)
-      cfg = {
+      cfg = load_config.merge(
         "enabled"        => true,
         "browser"        => "chrome",
         "chrome_version" => chrome_version.to_s,
         "configured_at"  => Date.today.to_s
-      }
+      )
       FileUtils.mkdir_p(File.dirname(BROWSER_CONFIG_PATH))
       File.write(BROWSER_CONFIG_PATH, cfg.to_yaml)
       reload
+    end
+
+    # Persist the screenshot preferences written by the settings UI.
+    # No daemon reload: the browser tool re-reads browser.yml on every screenshot.
+    # @param max_base64_bytes [Integer, nil] screenshot size ceiling in bytes
+    # @return [Hash] the effective settings after the update
+    def update_screenshot_settings(max_base64_bytes: nil)
+      raise "Browser not configured. Run /browser-setup first." unless File.exist?(BROWSER_CONFIG_PATH)
+
+      if !max_base64_bytes.nil? && !(max_base64_bytes.is_a?(Integer) && max_base64_bytes.positive?)
+        raise ArgumentError, "screenshot_max_base64_bytes must be a positive integer"
+      end
+
+      cfg = load_config
+      cfg["screenshot_max_base64_bytes"] = max_base64_bytes unless max_base64_bytes.nil?
+
+      File.write(BROWSER_CONFIG_PATH, cfg.to_yaml)
+      @config = cfg
+      { screenshot_max_base64_bytes: effective_screenshot_limit(cfg) }
     end
 
     # Toggle the browser tool on/off by flipping `enabled` in browser.yml.
@@ -222,6 +245,13 @@ module Clacky
     rescue StandardError => e
       Clacky::Logger.warn("[BrowserManager] Failed to read browser.yml: #{e.message}")
       {}
+    end
+
+    private def effective_screenshot_limit(cfg)
+      limit = cfg["screenshot_max_base64_bytes"]
+      return limit if limit.is_a?(Integer) && limit.positive?
+
+      Clacky::Tools::Browser::SCREENSHOT_MAX_BASE64_BYTES
     end
 
     # Must be called inside @mutex

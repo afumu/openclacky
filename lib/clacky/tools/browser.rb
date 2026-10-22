@@ -547,14 +547,17 @@ module Clacky
         limit = config["screenshot_max_base64_bytes"]
         max_base64_bytes = limit.is_a?(Integer) && limit.positive? ? limit : SCREENSHOT_MAX_BASE64_BYTES
         image_data = png_downscale_base64(image_block["data"], SCREENSHOT_MAX_WIDTH)
-        if image_data.bytesize > max_base64_bytes && config["screenshot_png256_fallback"] == true
+        if image_data.bytesize > max_base64_bytes
           image_data = Clacky::Utils::FileProcessor.quantize_png_base64(image_data)
         end
 
         if image_data.bytesize > max_base64_bytes
           size_kb = image_data.bytesize / 1024
+          saved   = original_path ? " The full-resolution file is saved at #{original_path}." : ""
           return { action: "screenshot", success: false, profile: "user",
-                   output: "Screenshot too large after resize (#{size_kb}KB). Use action=snapshot instead." }
+                   original_path: original_path,
+                   output: "Screenshot still too large after compression (#{size_kb}KB).#{saved} " \
+                           "Use action=snapshot instead." }
         end
 
         # Save compressed (800px) PNG for AI reference

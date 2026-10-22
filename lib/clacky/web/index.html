@@ -1381,6 +1381,20 @@
                 <button id="btn-browser-setup" class="btn-settings-action" data-i18n="settings.browser.btn">🌐 Configure Browser</button>
               </div>
             </div>
+            <div class="settings-screenshot" id="browser-screenshot-settings" style="display:none">
+              <div class="settings-screenshot-head">
+                <span class="settings-screenshot-title" data-i18n="settings.browser.screenshot.title">Screenshot quality</span>
+                <p class="settings-screenshot-desc" data-i18n="settings.browser.screenshot.desc">When the AI browses a web page it takes screenshots to "see" it. Higher quality looks clearer, but each screenshot takes up more of the conversation — long tasks can end up slower and more expensive.</p>
+              </div>
+              <div class="settings-screenshot-row">
+                <span class="settings-screenshot-label" data-i18n="settings.browser.screenshot.quality">Quality</span>
+                <div class="settings-segmented" id="browser-screenshot-quality">
+                  <button type="button" class="settings-segmented-btn" data-bytes="150000" data-i18n="settings.browser.screenshot.standard">Standard</button>
+                  <button type="button" class="settings-segmented-btn" data-bytes="300000" data-i18n="settings.browser.screenshot.high">High</button>
+                </div>
+              </div>
+              <p class="settings-screenshot-hint" data-i18n="settings.browser.screenshot.qualityHint">Standard is enough for most pages and saves space. High keeps more detail on long pages.</p>
+            </div>
           </section>
 
           <!-- Network / Proxy section -->

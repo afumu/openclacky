@@ -199,6 +199,88 @@ RSpec.describe Clacky::BrowserManager do
         expect(manager.status[:daemon_running]).to be true
       end
     end
+
+    context "screenshot settings" do
+      it "falls back to the built-in limit when unset" do
+        s = manager.status
+        expect(s[:screenshot_max_base64_bytes]).to eq(Clacky::Tools::Browser::SCREENSHOT_MAX_BASE64_BYTES)
+      end
+
+      it "returns the configured limit" do
+        write_config("enabled" => true, "screenshot_max_base64_bytes" => 300_000)
+        expect(manager.status[:screenshot_max_base64_bytes]).to eq(300_000)
+      end
+
+      it "ignores a non-positive limit" do
+        write_config("enabled" => true, "screenshot_max_base64_bytes" => 0)
+        expect(manager.status[:screenshot_max_base64_bytes])
+          .to eq(Clacky::Tools::Browser::SCREENSHOT_MAX_BASE64_BYTES)
+      end
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # #configure
+  # ---------------------------------------------------------------------------
+  describe "#configure" do
+    before { allow(manager).to receive(:reload) }
+
+    it "writes the detected chrome version" do
+      manager.configure(chrome_version: "148")
+      cfg = manager.send(:load_config)
+      expect(cfg["enabled"]).to be true
+      expect(cfg["browser"]).to eq("chrome")
+      expect(cfg["chrome_version"]).to eq("148")
+      expect(cfg["configured_at"]).to eq(Date.today.to_s)
+    end
+
+    it "keeps existing screenshot preferences" do
+      write_config("enabled" => false, "screenshot_max_base64_bytes" => 300_000)
+      manager.configure(chrome_version: "148")
+      cfg = manager.send(:load_config)
+      expect(cfg["screenshot_max_base64_bytes"]).to eq(300_000)
+    end
+  end
+
+  # ---------------------------------------------------------------------------
+  # #update_screenshot_settings
+  # ---------------------------------------------------------------------------
+  describe "#update_screenshot_settings" do
+    before { write_config("enabled" => true, "chrome_version" => "148") }
+
+    it "raises when browser.yml does not exist" do
+      FileUtils.rm_f(config_path)
+      expect { manager.update_screenshot_settings(max_base64_bytes: 300_000) }
+        .to raise_error(/not configured/)
+    end
+
+    it "persists the limit and returns the effective settings" do
+      result = manager.update_screenshot_settings(max_base64_bytes: 300_000)
+      expect(result[:screenshot_max_base64_bytes]).to eq(300_000)
+      expect(manager.send(:load_config)["screenshot_max_base64_bytes"]).to eq(300_000)
+    end
+
+    it "replaces an existing limit" do
+      write_config("enabled" => true, "screenshot_max_base64_bytes" => 300_000)
+      manager.update_screenshot_settings(max_base64_bytes: 200_000)
+      cfg = manager.send(:load_config)
+      expect(cfg["screenshot_max_base64_bytes"]).to eq(200_000)
+      expect(cfg["enabled"]).to be true
+    end
+
+    it "preserves unrelated keys" do
+      manager.update_screenshot_settings(max_base64_bytes: 300_000)
+      cfg = manager.send(:load_config)
+      expect(cfg["enabled"]).to be true
+      expect(cfg["chrome_version"]).to eq("148")
+    end
+
+    it "rejects a non-positive or non-integer limit" do
+      expect { manager.update_screenshot_settings(max_base64_bytes: 0) }
+        .to raise_error(ArgumentError)
+      expect { manager.update_screenshot_settings(max_base64_bytes: "300000") }
+        .to raise_error(ArgumentError)
+    end
   end
 
   # ---------------------------------------------------------------------------

@@ -7788,6 +7788,77 @@ body {
   gap: 0.625rem;
   flex-shrink: 0;
 }
+
+/* ── Browser screenshot settings ────────────────────────────────────────── */
+.settings-screenshot {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  padding: 0.875rem 1rem;
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 10px;
+}
+.settings-screenshot-row {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+}
+.settings-screenshot-head {
+  display: flex;
+  flex-direction: column;
+  gap: 0.1875rem;
+  padding-bottom: 0.125rem;
+}
+.settings-screenshot-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  color: var(--color-text-primary);
+}
+.settings-screenshot-desc {
+  margin: 0.25rem 0 0.5rem 0;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
+.settings-screenshot-label {
+  font-size: 0.8125rem;
+  color: var(--color-text-secondary);
+  flex-shrink: 0;
+}
+.settings-segmented {
+  display: inline-flex;
+  gap: 2px;
+  padding: 2px;
+  background: var(--color-bg-input);
+  border: 1px solid var(--color-border-primary);
+  border-radius: 7px;
+}
+.settings-segmented-btn {
+  border: 0;
+  background: transparent;
+  color: var(--color-text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.4;
+  padding: 0.1875rem 0.625rem;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+.settings-segmented-btn:hover:not(.active) {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+.settings-segmented-btn.active {
+  background: var(--color-accent-primary);
+  color: var(--color-text-inverse);
+}
+.settings-screenshot-hint {
+  margin: 0 0 0.25rem 0;
+  font-size: 0.75rem;
+  color: var(--color-text-tertiary);
+  line-height: 1.5;
+}
 .toggle-switch {
   position: relative;
   display: inline-flex;

@@ -709,6 +709,7 @@ module Clacky
         when ["POST",   "/api/browser/configure"]  then api_browser_configure(req, res)
         when ["POST",   "/api/browser/reload"]    then api_browser_reload(res)
         when ["POST",   "/api/browser/toggle"]    then api_browser_toggle(res)
+        when ["POST",   "/api/browser/settings"]  then api_browser_settings(req, res)
         when ["GET",    "/api/backup/status"]     then api_backup_status(res)
         when ["POST",   "/api/backup/run"]        then api_backup_run(res)
         when ["GET",    "/api/backup/download"]   then api_backup_download(res)
@@ -1695,6 +1696,22 @@ module Clacky
       def api_browser_toggle(res)
         enabled = @browser_manager.toggle
         json_response(res, 200, { ok: true, enabled: enabled })
+      rescue StandardError => e
+        json_response(res, 500, { ok: false, error: e.message })
+      end
+
+      # POST /api/browser/settings
+      # Body: { screenshot_max_base64_bytes: 300000 }
+      # The field is optional — omitting it keeps the current value.
+      def api_browser_settings(req, res)
+        body = JSON.parse(req.body.to_s) rescue {}
+
+        settings = @browser_manager.update_screenshot_settings(
+          max_base64_bytes: body["screenshot_max_base64_bytes"]
+        )
+        json_response(res, 200, { ok: true }.merge(settings))
+      rescue ArgumentError => e
+        json_response(res, 422, { ok: false, error: e.message })
       rescue StandardError => e
         json_response(res, 500, { ok: false, error: e.message })
       end
