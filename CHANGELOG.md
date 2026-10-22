@@ -4,6 +4,55 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 
+## [1.5.21] - 2026-10-22
+
+### Added
+- Switch the current session between Manual and Auto approval from the composer, even while a task is running
+- Wait 20 seconds on `ask_user` in auto mode before the agent decides, with the delay configurable through `ask_user_timeout_seconds`
+- Add DeepSeek hosted web search and page fetch
+- Archive every session in a project at once
+- Add MiniMax M3.1 Flash
+- Support multiline terminal commands (#641 - @YeEmrick)
+- Fall back to a dependency-free PNG256 encoder when no image tool is available (#668 - @YeEmrick)
+- Configure where the server writes its PID file (#663)
+- Explain an unreachable license server where the license is entered
+- Point extension publishers at the contributor page
+- Prepare and persist shared feedback requests (#649)
+
+### Improved
+- Downscale oversized browser screenshots so they cost fewer tokens
+- Raise the file reader per-line limit to 8000 characters (#645 - @YeEmrick)
+- Spell out the billing basis in price tooltips
+- Tidy the session search palette and its content-match snippets
+
+### Fixed
+- Refresh data management lists after archiving or deleting from the sidebar (#673)
+- Make bulk delete in the recycle bin and archive respect the active filters (#672)
+- Keep routing channel messages to a session after it is archived (#671)
+- Stop long terminal commands from echoing a duplicated wrapped tail (#670)
+- Page session lists by a server-issued cursor so long lists no longer skip sessions (#669)
+- Refresh the header title when the active session is renamed (#666)
+- Match chat navigator rounds by task id so compression no longer misaligns them (#664)
+- Stop dropping replayed chunks that continue an earlier turn (#662)
+- Apply model card edits to a running session immediately (#661)
+- Keep the attachment strip inside the new-session composer card (#659)
+- Keep the /#new draft name out of sessions created by a quick action (#658)
+- Keep the Default reasoning choice intact after reopening settings
+- Suggest switching models when retries are exhausted
+- Correct MiniMax-M3 rates with its 512K tier
+- Complete MiniMax Flash effort handling and retire the legacy Ollama choices (#655 - @octo-patch)
+- Drop tool results with a blank call id before sending
+- Preserve response headers when handling Anthropic stream errors (#642)
+- Stop compressing oversized recent messages over and over (#643)
+- Localize device-login errors and stop showing the user code
+- Localize the QR lightbox caption and stop clipping its close button
+- Keep web search on the free engine chain unless DeepSeek is chosen
+- Stop extension reloads from serving a stale cached bundle when the manifest path changes
+
+### More
+- Retire the slow GPT-6 and Grok 4.7 aliases from the model picker; their lanes stay routable for existing sessions
+- Bill the Bedrock GPT lane at a 20% markup
+
 ## [1.5.20] - 2026-10-15
 
 ### Added
