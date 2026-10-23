@@ -117,7 +117,6 @@ module Clacky
           else
             @history.to_api(force_reasoning_content_pad: force_reasoning_content_pad)
           end
-          messages_to_send = feedback_messages_for_llm(messages_to_send)
 
           response = @client.send_messages_with_tools(
             messages_to_send,

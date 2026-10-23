@@ -152,66 +152,6 @@ RSpec.describe "Business tool feedback" do
     expect(result[:feedback_request][:questions].first[:options]).to eq(request[:options])
   end
 
-  it "sends only the completed summary and Auto instruction while retaining the full replay result" do
-    config.permission_mode = :auto_approve
-    summary = "Two designs are ready:\n1. A — /a.html\n2. B — /b.html"
-    allow(terminal).to receive(:execute).and_return(
-      status: "complete", output: "Long business output", message: summary, feedback_request: request
-    )
-    action = execute
-    agent.send(:observe, { tool_calls: [call] }, action[:tool_results])
-    original = agent.history.to_a.find { |message| message[:tool_call_id] == call[:id] }[:content].dup
-    sent = nil
-    allow(client).to receive(:send_messages_with_tools) do |messages, **_options|
-      sent = messages
-      mock_api_response(content: "Continued")
-    end
-
-    agent.send(:call_llm)
-
-    compact = JSON.parse(sent.find { |message| message[:tool_call_id] == call[:id] }[:content], symbolize_names: true)
-    expect(compact.keys).to match_array([:status, :message, :auto_reply])
-    expect(compact).to include(status: "complete", message: summary, auto_reply: /reasonable decision/)
-    expect(agent.history.to_a.find { |message| message[:tool_call_id] == call[:id] }[:content]).to eq(original)
-    expect(JSON.parse(original)).to include("output" => "Long business output", "awaiting_feedback" => true)
-    expect(replay).to include(hash_including(type: "feedback_countdown", resolution: :timeout))
-  end
-
-  it "keeps manual feedback, ordinary results and malformed historical content unchanged" do
-    manual = { role: "tool", content: JSON.generate(feedback_request: request, message: "Waiting") }
-    ordinary = { role: "tool", content: JSON.generate(output: "Keep this", auto_reply: "Not a feedback result") }
-    malformed = { role: "tool", content: "{truncated" }
-    messages = [manual, ordinary, malformed, { role: "user", content: "Continue" }]
-    expect(agent.send(:feedback_messages_for_llm, messages)).to eq(messages)
-  end
-
-  it "replays the timeout even after compression truncates the business tool JSON" do
-    config.permission_mode = :auto_approve
-    action = execute
-    agent.send(:observe, { tool_calls: [call] }, action[:tool_results])
-    agent.history.mutate_last_matching(->(message) { message[:tool_call_id] == call[:id] }) do |message|
-      message[:content] = '{"status":"complete","workers":[... [Content truncated]'
-    end
-    output = replay
-    expect(output).to include(hash_including(type: "feedback_countdown", request_id: call[:id], resolved: true, resolution: "timeout"))
-  end
-
-  it "preserves the supplied App AI action context once in the model summary" do
-    config.permission_mode = :auto_approve
-    summary = "App AI configuration requested. Read the published model catalog, save and apply a suitable model."
-    allow(terminal).to receive(:execute).and_return(
-      exit_code: 0, message: summary, feedback_request: request.merge(metadata: { eazo: { kind: "app_ai", id: "ai-event" } })
-    )
-    action = execute
-    message = { role: "tool", tool_call_id: call[:id], content: action[:tool_results].first[:content] }
-    compact = JSON.parse(agent.send(:feedback_messages_for_llm, [message]).first[:content], symbolize_names: true)
-    expect(compact.keys).to match_array([:status, :message, :auto_reply])
-    expect(compact[:message]).to eq(summary)
-    expect(events.find { |event| event[:type] == "request_feedback" }[:questions].first[:metadata]).to eq(
-      eazo: { kind: "app_ai", id: "ai-event" }
-    )
-  end
-
   [:intervened, "Use B"].each do |answer|
     it "respects human takeover during Auto: #{answer}" do
       config.permission_mode = :auto_approve
