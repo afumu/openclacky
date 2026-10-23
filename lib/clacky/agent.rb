@@ -1791,6 +1791,13 @@ module Clacky
                 result = result.merge(
                   auto_reply: "No user is available. Please make a reasonable decision based on the context and continue."
                 )
+                # Tool content may later be shortened by compression. Keep the
+                # resolved deadline on the durable event trail used by replay.
+                if business_feedback
+                  @history.append_ext_event(type: "feedback_countdown", data: {
+                    request_id: call[:id].to_s, resolved: true, resolution: "timeout"
+                  })
+                end
               elsif countdown.is_a?(String) && !countdown.strip.empty?
                 # User stepped in and typed an answer right away. Route it through
                 # the denied+feedback path so the agent responds to it immediately
