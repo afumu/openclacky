@@ -850,11 +850,6 @@ module Clacky
         else
           ui.show_tool_result(content)
         end
-        result = JSON.parse(content, symbolize_names: true) rescue nil
-        request = result[:feedback_request] if result.is_a?(Hash)
-        if request.is_a?(Hash) && request[:request_id] == tool_call_id.to_s && result[:auto_reply]
-          ui.emit("feedback_countdown", request_id: request[:request_id], resolved: true, resolution: :timeout)
-        end
       end
 
       # Tool names live on the preceding assistant message, so remember them by

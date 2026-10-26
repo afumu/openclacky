@@ -89,7 +89,7 @@ RSpec.describe "Business tool feedback" do
     end
   end
 
-  it "times out without a browser and replays one resolved card after restoring the session" do
+  it "times out without a browser and preserves the outcome after restoring the session" do
     config.permission_mode = :auto_approve
     action = execute
     expect(payload(action)[:auto_reply]).to include("reasonable decision")
@@ -103,7 +103,10 @@ RSpec.describe "Business tool feedback" do
     expect(output.count { |event| event[:type] == "ext.example.feedback_requested" }).to eq(1)
     expect(output.find { |event| event[:type] == "ext.example.feedback_requested" }).to include(
       request_id: call[:id], feedback_source: request[:metadata][:eazo])
-    expect(output).to include(hash_including(type: "feedback_countdown", request_id: call[:id], resolved: true, resolution: :timeout))
+    restored_result = JSON.parse(output.find { |event| event[:type] == "tool_result" }[:result], symbolize_names: true)
+    expect(restored_result).to include(auto_reply: /reasonable decision/)
+    expect(restored_result[:feedback_request][:request_id]).to eq(call[:id])
+    expect(output.none? { |event| event[:type] == "feedback_countdown" }).to be true
     expect(output.index { |event| event[:type] == "tool_result" }).to be > output.index { |event| event[:type] == "ext.example.feedback_requested" }
     expect(agent.history.to_api.first).not_to have_key(:feedback_requests)
   end
