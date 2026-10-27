@@ -1759,11 +1759,8 @@ module Clacky
           end
 
           business_feedback = result.is_a?(Hash) && result[:feedback_request]
-          needs_feedback = business_feedback ||
-            (Tools::AskUser.feedback_tool?(call[:name]) && result.is_a?(Hash) && result[:awaiting_feedback])
-
-          # Show completed tool results before feedback; native Ask only shows its card.
-          unless needs_feedback && Tools::AskUser.feedback_tool?(call[:name])
+          # Business tools show their completed result before requesting feedback.
+          if business_feedback && !Tools::AskUser.feedback_tool?(call[:name])
             formatted_result = tool.respond_to?(:format_result) ? tool.format_result(result) : result.to_s
             ui_result = tool.respond_to?(:ui_result) ? tool.ui_result(result) : nil
             if ui_result
@@ -1773,6 +1770,8 @@ module Clacky
             end
           end
 
+          needs_feedback = business_feedback ||
+            (Tools::AskUser.feedback_tool?(call[:name]) && result.is_a?(Hash) && result[:awaiting_feedback])
           if needs_feedback
             # Prepare and persist the complete request before displaying it or
             # starting the wait. Extensions and native questions share one result.
@@ -1805,6 +1804,15 @@ module Clacky
             else
               # confirm_all / confirm_safes — a human is present, truly wait for user input.
               awaiting_feedback = true
+            end
+          else
+            # Use tool's format_result method to get display-friendly string
+            formatted_result = tool.respond_to?(:format_result) ? tool.format_result(result) : result.to_s
+            ui_result = tool.respond_to?(:ui_result) ? tool.ui_result(result) : nil
+            if ui_result
+              @ui&.show_tool_result(redact_tool_args(formatted_result), ui: redact_tool_args(ui_result))
+            else
+              @ui&.show_tool_result(redact_tool_args(formatted_result))
             end
           end
 

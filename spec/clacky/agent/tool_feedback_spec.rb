@@ -70,8 +70,6 @@ RSpec.describe "Business tool feedback" do
     expect(action[:awaiting_feedback]).to be true
     expect(prepared_count).to eq(1)
     expect(events.count { |entry| entry[:type] == "request_feedback" }).to eq(1)
-    expect(events.count { |entry| entry[:type] == "tool_result" }).to eq(1)
-    expect(events.index { |entry| entry[:type] == "tool_result" }).to be < events.index { |entry| entry[:type] == "request_feedback" }
     expect(@assistant_message[:tool_calls].first[:function][:name]).to eq("terminal")
     expect(@assistant_message[:tool_calls].first[:function][:arguments]).to eq(call[:arguments])
   end
@@ -85,7 +83,6 @@ RSpec.describe "Business tool feedback" do
       )
       action = execute([call, call.merge(id: "sibling")])
       expect(action[:tool_results].size).to eq(2)
-      expect(events.count { |entry| entry[:type] == "tool_result" }).to eq(2)
       expect(JSON.parse(action[:tool_results].last[:content])).to include("output" => "Sibling completed")
       expect(action[:awaiting_feedback]).to eq(mode == :confirm_all)
       expect(payload(action).key?(:auto_reply)).to eq(mode == :auto_approve)

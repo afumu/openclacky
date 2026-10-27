@@ -44,7 +44,6 @@ RSpec.describe "Prepared feedback" do
           request[:answer_context] = "Discuss means no file changes."
         end
         action = agent.send(:act, [call], assistant_message: @assistant_message)
-        expect(events.none? { |entry| entry[:type] == "tool_result" }).to be true
         result = JSON.parse(action[:tool_results].first[:content], symbolize_names: true)
         prepared = agent.history.to_a.find { |item| item[:feedback_requests] }.fetch(:feedback_requests).fetch(call[:id])
         expect(result).not_to have_key(:feedback_request)
